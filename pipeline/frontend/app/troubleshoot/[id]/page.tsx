@@ -863,9 +863,16 @@ export default function CaseWizardPage() {
         setLoading(false);
 
         // Resuming past the retrieval step (or landing on a closed case)
-        // skips runStep("retrieve_coarse"), so the history card would only
-        // ever appear on a first run through. Fetch it here too.
+        // skips runStep("retrieve_coarse"), so the history cards would only
+        // ever appear on a first run through. Fetch them here too.
         if (axes) {
+          void apiRequest<CoarseMatch[]>(`/cases/${caseId}/retrieval/coarse`)
+            .then((coarse) => {
+              if (!cancelled) patchArtifacts({ coarse });
+            })
+            .catch(() => {
+              // the card stays hidden
+            });
           void getPrecedents(caseId)
             .then((precedents) => {
               if (!cancelled) patchArtifacts({ precedents });
